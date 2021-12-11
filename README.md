@@ -1,8 +1,7 @@
 # Install
-
-run `yarn install`
+run `yarn` or  `yarn install` 
 ## Start
-### `yarn start`
+to start the project run `yarn start` 
 ## Middleware
-### Make sure your backend is running at port https:localhost:3000 or change the URL in .env file
+The server app is in https://github.com/NinjaRMM/devicesTask_serverApp , make sure your backend is running at port `http:localhost:3000` to use the WebServices or change url in .env file
 

@@ -30,7 +30,7 @@ export const Dashboard = () => {
     const [openModal, setOpenModal] = useState<boolean>(false)
 
     const filterByDevice = (value: string[]) => {
-         if (value.length === 1 && value.includes('all') && typeSelected.includes('all')) {
+        if (value.length === 1 && value.includes('all') && typeSelected.includes('all')) {
             return setDevicesDisplayed([...devices]);
         }
         if ((!typeSelected.includes('all') && value.includes('all')) || (value.length === 0)) {
@@ -101,7 +101,7 @@ export const Dashboard = () => {
 
     return (
         <div className="container mt-5 d-flex flex-wrap justify-content-center">
-            <h1 className="col-12 text-center fontsize40">Dashboard</h1>
+            <h1 className="col-12 text-center font__size__60">Dashboard</h1>
             <div className="col-12 d-flex flex-wrap justify-content-center p-5">
                 <div className="mx-3 col-5 d-flex flex-wrap justify-content-end">
                     <SelectComponent
@@ -109,7 +109,7 @@ export const Dashboard = () => {
                         handleChange={filterByDevice}
                         selected={typeSelected}
                         options={[{ label: 'All', value: 'all' }, ...typeOptions]}
-                        label="Device Type: " />
+                        label="Device Type (Multiple)" />
                 </div>
                 <div className="mx-3 col-5 d-flex flex-wrap justify-content-start">
                     <SelectComponent
