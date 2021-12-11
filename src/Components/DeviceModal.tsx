@@ -7,22 +7,26 @@ import { typeOptions } from '../Utils/options';
 import { useEffect } from "react";
 import { Controller, useForm } from 'react-hook-form';
 
-export const DeviceModal = ({ open, setOpen, device, handleSave, handleSaveEdit }:
+const emptyForm = { system_name: '', type: '', hdd_capacity: '' };
+
+export const DeviceModal = ({ open, setOpen, device, setDevice, handleSave, handleSaveEdit }:
     {
         open: boolean,
         setOpen: CallableFunction,
         device: Device | null,
         handleSave: CallableFunction,
-        handleSaveEdit: CallableFunction
+        handleSaveEdit: CallableFunction,
+        setDevice: CallableFunction
     }) => {
 
 
     const methods = useForm({
         mode: 'onChange',
-        defaultValues: { system_name: '', type:'', hdd_capacity: '' }
+        defaultValues: emptyForm
     });
     const handleClose = () => {
         setOpen(false);
+        setDevice(null);
     };
 
     const onSubmit = (values: any) => {
@@ -38,8 +42,13 @@ export const DeviceModal = ({ open, setOpen, device, handleSave, handleSaveEdit 
     }
 
     useEffect(() => {
-        methods.reset({ ...device })
-    }, [device])
+        if (device) {
+            methods.reset({...device});
+        } else {
+            methods.reset(emptyForm);
+        }
+    }, [device]);
+
 
     return (
         <div>
@@ -67,7 +76,7 @@ export const DeviceModal = ({ open, setOpen, device, handleSave, handleSaveEdit 
                                 }) => (
                                     <SelectComponent
                                         name="type"
-                                        selected={value?value:''}
+                                        selected={value ? value : ''}
                                         handleChange={onChange}
                                         required={true}
                                         className='col-12'

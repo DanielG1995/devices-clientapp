@@ -8,7 +8,7 @@ import { useAlert } from './useAlert';
 export const useDevices = () => {
 
     const [devices, setDevices] = useState<Device[]>([]);
-    const [device, setDevice] = useState<Device | null>();
+    const [device, setDevice] = useState<Device | null>(null);
     const { showNotification } = useAlert();
 
     const getDevices = useCallback(
@@ -29,8 +29,7 @@ export const useDevices = () => {
         async (id: string) => {
             try {
                 const response = await api(`${baseUrl}/${id}`, 'DELETE');
-                debugger;
-                if (response?.statusText === 'OK') {
+                 if (response?.statusText === 'OK') {
                     setDevice(response?.data);
                     showNotification('', 'Deleted!', 'success');
                     setDevices(devices.filter(dev => dev.id !== id));

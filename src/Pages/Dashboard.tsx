@@ -75,8 +75,8 @@ export const Dashboard = () => {
 
     const saveEdit = (deviceEdited: Device) => {
         editDevice(deviceEdited, device?.id || '');
-        setDevice(null);
         setOpenModal(false);
+        setDevice(null);
     }
 
     const saveItem = (device: Device) => {
@@ -123,7 +123,7 @@ export const Dashboard = () => {
             <div className="col-8 position-relative">
                 <AddButton openModal={openModal} setOpenModal={setOpenModal} />
                 <Table deleteItem={confirmationDialogDelete} editItem={editItem} data={devicesDisplayed} />
-                <DeviceModal handleSave={saveItem} handleSaveEdit={saveEdit} device={device || null} open={openModal} setOpen={setOpenModal}></DeviceModal>
+                <DeviceModal handleSave={saveItem} handleSaveEdit={saveEdit} setDevice={setDevice} device={device} open={openModal} setOpen={setOpenModal}></DeviceModal>
             </div>
         </div>
     )
