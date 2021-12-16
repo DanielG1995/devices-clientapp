@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Table as TableMaterial, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 import { Device } from '../Utils/interfaces';
 import EditIcon from '@mui/icons-material/Edit';
@@ -17,6 +17,12 @@ export const Table = ({ data, deleteItem, editItem }:
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
+
+    useEffect(() => {
+        if ((data?.length || 0) <= rowsPerPage) {
+            setPage(0);
+        }
+    }, [data, rowsPerPage])
 
     return (
         <div>
@@ -91,7 +97,7 @@ export const Table = ({ data, deleteItem, editItem }:
                 component="div"
                 count={data?.length || 1}
                 rowsPerPage={rowsPerPage}
-                page={page}
+                page={((data?.length || 1) <= rowsPerPage) ? 0 : page}
                 onPageChange={(evt, page) => { (handleChangePage(page)) }}
                 onRowsPerPageChange={(evt) => handleChangeRowsPerPage(evt)}
             />

@@ -1,26 +1,20 @@
 import { useDevices } from "../Hooks/useDevices";
 import { Device } from '../Utils/interfaces';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Table } from "../Components/Table";
 import { SelectComponent } from "../Components/SelectComponent";
 import { AddButton } from "../Components/AddButton";
 import { sortByOptions, typeOptions } from "../Utils/options";
 import { useAlert } from "../Hooks/useAlert";
 import { DeviceModal } from "../Components/DeviceModal";
+import { filterBy, sortBy } from "../Helpers/helpersTable";
+import { api } from "../Services/api";
+import { baseUrl } from '../Utils/urls';
 
 export const Dashboard = () => {
 
 
-    const {
-        getDevices,
-        devices,
-        deleteDevice,
-        device,
-        setDevice,
-        saveDevice,
-        editDevice,
-        setDevices,
-    } = useDevices();
+    const { saveDevice, device, setDevice, devices, deleteDevice, editDevice, setDevices } = useDevices();
 
     const { showConfirm } = useAlert();
 
@@ -29,40 +23,6 @@ export const Dashboard = () => {
     const [sortBySelected, setSortBySelected] = useState<string>('');
     const [openModal, setOpenModal] = useState<boolean>(false)
 
-    const filterByDevice = (value: string[]) => {
-        if (value.length === 1 && value.includes('all') && typeSelected.includes('all')) {
-            return setDevicesDisplayed([...devices]);
-        }
-        if ((!typeSelected.includes('all') && value.includes('all')) || (value.length === 0)) {
-            setTypeSelected(['all']);
-            return setDevicesDisplayed([...devices]);
-        }
-        if (typeSelected.includes('all') && value.includes('all')) {
-            value = value.filter(val => val !== 'all');
-        }
-        setTypeSelected(value);
-        setDevicesDisplayed(
-            devices.filter(device => value?.includes(device?.type?.toUpperCase().replaceAll(' ', '')))
-        );
-
-    }
-
-    const sortBy = (value: string) => {
-        setSortBySelected(value);
-        const sortedList = devices?.sort((a: any, b: any) => {
-            if (a?.[value] === b?.[value]) {
-                return 0;
-            }
-            if (isNaN(a?.[value])) {
-                return a?.[value] > b?.[value] ? 1 : -1;
-            } else {
-                return Number(a?.[value]) - Number(b?.[value])
-            }
-        });
-        setDevices(sortedList);
-        filterByDevice(typeSelected);
-
-    }
 
     const confirmationDialogDelete = (id: string) => {
         showConfirm('Are you sure do you want to delete this item?', deleteDevice, id);
@@ -81,23 +41,32 @@ export const Dashboard = () => {
 
     const saveItem = (device: Device) => {
         saveDevice(device);
-        setOpenModal(false);
-        setDevice(null);
     }
 
-    useEffect(() => {
-        getDevices();
-        //eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    const loadDevices = useCallback(
+        (devicesService) => {
+            setDevices(devicesService);
+            setDevicesDisplayed(devicesService)
+        },
+        [setDevices]
+    )
+
 
     useEffect(() => {
-        if (sortBySelected !== '') {
-            sortBy(sortBySelected);
-        } else {
-            filterByDevice(typeSelected);
+        const init = async () => {
+            const response = await api(baseUrl, 'GET');
+            if (response?.statusText === 'OK') {
+                loadDevices([...response?.data]);
+            }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [devices])
+        init();
+    }, [loadDevices])
+
+
+    useEffect(() => {
+        const listFiltered = [...filterBy(typeSelected, devices)]
+        setDevicesDisplayed([...sortBy(sortBySelected, listFiltered)]);
+    }, [devices, sortBySelected, typeSelected])
 
     return (
         <div className="container mt-5 d-flex flex-wrap justify-content-center">
@@ -106,14 +75,14 @@ export const Dashboard = () => {
                 <div className="mx-3 col-5 d-flex flex-wrap justify-content-end">
                     <SelectComponent
                         multiple={true}
-                        handleChange={filterByDevice}
+                        handleChange={setTypeSelected}
                         selected={typeSelected}
-                        options={[{ label: 'All', value: 'all' }, ...typeOptions]}
+                        options={[{ label: 'all', value: 'all' }, ...typeOptions]}
                         label="Device Type (Multiple)" />
                 </div>
                 <div className="mx-3 col-5 d-flex flex-wrap justify-content-start">
                     <SelectComponent
-                        handleChange={sortBy}
+                        handleChange={setSortBySelected}
                         selected={sortBySelected}
                         options={sortByOptions}
                         label="Sort by: " />

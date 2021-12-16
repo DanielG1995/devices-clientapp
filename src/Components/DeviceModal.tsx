@@ -22,15 +22,16 @@ export const DeviceModal = ({ open, setOpen, device, setDevice, handleSave, hand
 
     const methods = useForm({
         mode: 'onChange',
-        defaultValues: emptyForm
+        defaultValues: (device?.id) ? device : emptyForm
     });
     const handleClose = () => {
         setOpen(false);
         setDevice(null);
+        methods.reset(emptyForm);
     };
 
     const onSubmit = (values: any) => {
-        if (device) {
+        if (device?.id) {
             handleSaveEdit(values)
         } else {
             handleSave(values);
@@ -42,11 +43,13 @@ export const DeviceModal = ({ open, setOpen, device, setDevice, handleSave, hand
     }
 
     useEffect(() => {
-        if (device) {
-            methods.reset({...device});
-        } else {
-            methods.reset(emptyForm);
+        if (device?.id) {
+            return methods.reset({ ...device });
         }
+        if (!device) {
+            return methods.reset(emptyForm)
+        }
+
     }, [device]);
 
 
@@ -97,7 +100,7 @@ export const DeviceModal = ({ open, setOpen, device, setDevice, handleSave, hand
                                 Save
                             </Button>
                             <Button className="mx-3" variant="danger" onClick={() => handleClose()}>
-                                Cancel
+                                Close
                             </Button>
                         </div>
                     </form>

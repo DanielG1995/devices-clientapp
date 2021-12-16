@@ -11,25 +11,11 @@ export const useDevices = () => {
     const [device, setDevice] = useState<Device | null>(null);
     const { showNotification } = useAlert();
 
-    const getDevices = useCallback(
-        async () => {
-            try {
-                const response = await api(baseUrl, 'GET');
-                if (response?.statusText === 'OK') {
-                    setDevices(response?.data);
-                }
-            } catch (error) {
-                showNotification('ERROR', '', 'error');
-            }
-        },
-        [showNotification],
-    );
-
     const deleteDevice = useCallback(
         async (id: string) => {
             try {
                 const response = await api(`${baseUrl}/${id}`, 'DELETE');
-                 if (response?.statusText === 'OK') {
+                if (response?.statusText === 'OK') {
                     setDevice(response?.data);
                     showNotification('', 'Deleted!', 'success');
                     setDevices(devices.filter(dev => dev.id !== id));
@@ -39,8 +25,7 @@ export const useDevices = () => {
             }
         },
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [showNotification],
+        [showNotification, devices],
     );
 
     const getDevice = useCallback(
@@ -63,8 +48,7 @@ export const useDevices = () => {
                 const response = await api(`${baseUrl}`, 'POST', data);
                 if (response?.statusText === 'OK') {
                     showNotification('', 'Added!', 'success');
-                    data.id = response?.data?.id
-                    setDevices([...devices, data]);
+                    setDevices([...devices, { ...data, id: response?.data?.id }]);
                 } else {
                     showNotification('ERROR', 'It could not be saved', 'error');
                 }
@@ -73,8 +57,7 @@ export const useDevices = () => {
             }
         },
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [showNotification],
+        [showNotification, devices],
     )
 
     const editDevice = useCallback(
@@ -99,8 +82,7 @@ export const useDevices = () => {
             }
         },
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [showNotification],
+        [showNotification, devices],
     )
-    return { getDevices, saveDevice, getDevice, device, setDevice, devices, deleteDevice, editDevice, setDevices };
+    return { saveDevice, getDevice, device, setDevice, devices, deleteDevice, editDevice, setDevices };
 }
